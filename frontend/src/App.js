@@ -1,46 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { getProducts } from './api/api';
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import ProductsPage from './pages/ProductsPage';
+import RawMaterialsPage from './pages/RawMaterialsPage';
+import ProductCompositionPage from './pages/ProductCompositionPage';
+import ProductionSuggestionPage from './pages/ProductionSuggestionPage';
 import './App.css';
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    // fetch products from backend
-    getProducts()
-      .then(response => {
-        setProducts(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching products:', error);
-        setError('Failed to load products');
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
   return (
     <div className="App">
-      <header className="App-header">
+      <nav className="navbar">
         <h1>Production Control System</h1>
-        <h2>Products</h2>
-        {products.length === 0 ? (
-          <p>No products found</p>
-        ) : (
-          <ul>
-            {products.map(product => (
-              <li key={product.id}>
-                {product.name} - R$ {product.value}
-              </li>
-            ))}
-          </ul>
-        )}
-      </header>
+        <ul className="nav-menu">
+          <li><Link to="/">Products</Link></li>
+          <li><Link to="/raw-materials">Raw Materials</Link></li>
+          <li><Link to="/compositions">Product Composition</Link></li>
+          <li><Link to="/suggestions">Production Suggestions</Link></li>
+        </ul>
+      </nav>
+
+      <main className="container">
+        <Routes>
+          <Route path="/" element={<ProductsPage />} />
+          <Route path="/raw-materials" element={<RawMaterialsPage />} />
+          <Route path="/compositions" element={<ProductCompositionPage />} />
+          <Route path="/suggestions" element={<ProductionSuggestionPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }
