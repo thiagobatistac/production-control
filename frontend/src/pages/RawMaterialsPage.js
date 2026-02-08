@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { 
-  getRawMaterials, 
-  createRawMaterial, 
-  updateRawMaterial, 
-  deleteRawMaterial,
-  getRawMaterialsInStock
-} from '../api/api';
+  fetchRawMaterials,
+  addRawMaterial,
+  editRawMaterial,
+  removeRawMaterial,
+  fetchRawMaterialsInStock
+} from '../redux/slices/rawMaterialsSlice';
 
 function RawMaterialsPage() {
-  const [rawMaterials, setRawMaterials] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // redux state
+  const dispatch = useDispatch();
+  const { items: rawMaterials, loading, error } = useSelector(state => state.rawMaterials);
+
+  // local state
   const [showForm, setShowForm] = useState(false);
   const [editingRawMaterial, setEditingRawMaterial] = useState(null);
   const [showOnlyInStock, setShowOnlyInStock] = useState(false);
@@ -23,39 +26,19 @@ function RawMaterialsPage() {
 
   // load raw materials on mount
   useEffect(() => {
-    loadRawMaterials();
-  }, []);
+    dispatch(fetchRawMaterials());
+  }, [dispatch]);
 
   // load all raw materials
-  const loadRawMaterials = async () => {
-    try {
-      setLoading(true);
-      const response = await getRawMaterials();
-      setRawMaterials(response.data);
-      setShowOnlyInStock(false);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load raw materials');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const loadAllRawMaterials = () => {
+    dispatch(fetchRawMaterials());
+    setShowOnlyInStock(false);
   };
 
   // load only raw materials with stock
-  const loadRawMaterialsInStock = async () => {
-    try {
-      setLoading(true);
-      const response = await getRawMaterialsInStock();
-      setRawMaterials(response.data);
-      setShowOnlyInStock(true);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load raw materials in stock');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  const loadRawMaterialsInStock = () => {
+    dispatch(fetchRawMaterialsInStock());
+    setShowOnlyInStock(true);
   };
 
   // handle form input change
@@ -101,19 +84,17 @@ function RawMaterialsPage() {
     try {
       if (editingRawMaterial) {
         // update
-        await updateRawMaterial(editingRawMaterial.id, formData);
+        await dispatch(editRawMaterial({ id: editingRawMaterial.id, rawMaterialData: formData })).unwrap();
       } else {
         // create
-        await createRawMaterial(formData);
+        await dispatch(addRawMaterial(formData)).unwrap();
       }
       
       setShowForm(false);
       setFormData({ name: '', stockQuantity: '' });
       setEditingRawMaterial(null);
-      loadRawMaterials();
     } catch (err) {
-      alert('Failed to save raw material: ' + (err.response?.data?.message || err.message));
-      console.error(err);
+      alert('Failed to save raw material: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -124,11 +105,9 @@ function RawMaterialsPage() {
     }
 
     try {
-      await deleteRawMaterial(id);
-      loadRawMaterials();
+      await dispatch(removeRawMaterial(id)).unwrap();
     } catch (err) {
-      alert('Failed to delete raw material: ' + (err.response?.data?.message || err.message));
-      console.error(err);
+      alert('Failed to delete raw material: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -139,7 +118,7 @@ function RawMaterialsPage() {
     setEditingRawMaterial(null);
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading && rawMaterials.length === 0) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -149,7 +128,7 @@ function RawMaterialsPage() {
         
         {/* action buttons */}
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-          <button onClick={loadRawMaterials} className="btn btn-secondary">
+          <button onClick={loadAllRawMaterials} className="btn btn-secondary">
             Show All
           </button>
           <button onClick={loadRawMaterialsInStock} className="btn btn-secondary">

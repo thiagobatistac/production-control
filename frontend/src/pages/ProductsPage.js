@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { 
-  getProducts, 
-  createProduct, 
-  updateProduct, 
-  deleteProduct,
-  searchProducts 
-} from '../api/api';
+  fetchProducts,
+  addProduct,
+  editProduct,
+  removeProduct,
+  searchProductsByName
+} from '../redux/slices/productsSlice';
 
 function ProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // redux state
+  const dispatch = useDispatch();
+  const { items: products, loading, error } = useSelector(state => state.products);
+
+  // local state
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,42 +26,16 @@ function ProductsPage() {
 
   // load products on mount
   useEffect(() => {
-    loadProducts();
-  }, []);
-
-  // load all products
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await getProducts();
-      setProducts(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load products');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   // handle search
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!searchTerm.trim()) {
-      loadProducts();
+      dispatch(fetchProducts());
       return;
     }
-
-    try {
-      setLoading(true);
-      const response = await searchProducts(searchTerm);
-      setProducts(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to search products');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    dispatch(searchProductsByName(searchTerm));
   };
 
   // handle form input change
@@ -104,19 +81,17 @@ function ProductsPage() {
     try {
       if (editingProduct) {
         // update
-        await updateProduct(editingProduct.id, formData);
+        await dispatch(editProduct({ id: editingProduct.id, productData: formData })).unwrap();
       } else {
         // create
-        await createProduct(formData);
+        await dispatch(addProduct(formData)).unwrap();
       }
       
       setShowForm(false);
       setFormData({ name: '', value: '' });
       setEditingProduct(null);
-      loadProducts();
     } catch (err) {
-      alert('Failed to save product: ' + (err.response?.data?.message || err.message));
-      console.error(err);
+      alert('Failed to save product: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -127,11 +102,9 @@ function ProductsPage() {
     }
 
     try {
-      await deleteProduct(id);
-      loadProducts();
+      await dispatch(removeProduct(id)).unwrap();
     } catch (err) {
-      alert('Failed to delete product: ' + (err.response?.data?.message || err.message));
-      console.error(err);
+      alert('Failed to delete product: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -142,7 +115,7 @@ function ProductsPage() {
     setEditingProduct(null);
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading && products.length === 0) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -163,7 +136,7 @@ function ProductsPage() {
           <button onClick={handleSearch} className="btn btn-secondary">
             Search
           </button>
-          <button onClick={loadProducts} className="btn btn-secondary">
+          <button onClick={() => dispatch(fetchProducts())} className="btn btn-secondary">
             Clear
           </button>
           <button onClick={handleCreate} className="btn btn-primary">

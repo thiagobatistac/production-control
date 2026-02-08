@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts } from '../redux/slices/productsSlice';
+import { fetchRawMaterials } from '../redux/slices/rawMaterialsSlice';
 import { 
-  getProducts,
-  getRawMaterials,
   getCompositionsByProduct,
   addComposition,
   updateComposition,
@@ -9,11 +10,15 @@ import {
 } from '../api/api';
 
 function ProductCompositionPage() {
-  const [products, setProducts] = useState([]);
-  const [rawMaterials, setRawMaterials] = useState([]);
+  // redux state
+  const dispatch = useDispatch();
+  const { items: products } = useSelector(state => state.products);
+  const { items: rawMaterials } = useSelector(state => state.rawMaterials);
+
+  // local state
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [compositions, setCompositions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingComposition, setEditingComposition] = useState(null);
@@ -26,27 +31,9 @@ function ProductCompositionPage() {
 
   // load products and raw materials on mount
   useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  // load products and raw materials
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-      const [productsRes, rawMaterialsRes] = await Promise.all([
-        getProducts(),
-        getRawMaterials()
-      ]);
-      setProducts(productsRes.data);
-      setRawMaterials(rawMaterialsRes.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load data');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(fetchProducts());
+    dispatch(fetchRawMaterials());
+  }, [dispatch]);
 
   // load compositions for selected product
   const loadCompositions = async (productId) => {
@@ -163,8 +150,8 @@ function ProductCompositionPage() {
     setEditingComposition(null);
   };
 
-  if (loading && products.length === 0) return <div className="loading">Loading...</div>;
-  if (error && products.length === 0) return <div className="error">{error}</div>;
+  if (loading && compositions.length === 0 && selectedProduct) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div>
