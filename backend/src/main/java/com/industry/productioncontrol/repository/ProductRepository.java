@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCase(String name);
 
     // get all products ordered from most expensive to cheapest
-    List<Product> findAllByOrderByValueDesc();
+    List<Product> findAllByOrderByPriceDesc();
 
     // check if a product with this name already exists
     boolean existsByName(String name);

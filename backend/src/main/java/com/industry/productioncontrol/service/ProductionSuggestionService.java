@@ -25,7 +25,7 @@ public class ProductionSuggestionService {
     public ProductionSuggestionResponseDTO calculateProductionSuggestions() {
         // get all products ordered by value (most expensive first)
         List<Product> products = productRepository.findAllWithCompositions();
-        products.sort((p1, p2) -> p2.getValue().compareTo(p1.getValue()));
+        products.sort((p1, p2) -> p2.getPrice().compareTo(p1.getPrice()));
 
         // get current stock of all raw materials
         Map<Long, BigDecimal> availableStock = new HashMap<>();
@@ -50,9 +50,9 @@ public class ProductionSuggestionService {
                 ProductionSummaryResponseDTO summary = new ProductionSummaryResponseDTO();
                 summary.setProductId(product.getId());
                 summary.setProductName(product.getName());
-                summary.setProductValue(product.getValue());
+                summary.setProductValue(product.getPrice());
                 summary.setQuantity(maxQuantity);
-                summary.setTotalValue(product.getValue().multiply(new BigDecimal(maxQuantity)));
+                summary.setTotalValue(product.getPrice().multiply(new BigDecimal(maxQuantity)));
 
                 suggestions.add(summary);
                 totalValue = totalValue.add(summary.getTotalValue());

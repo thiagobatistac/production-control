@@ -6,16 +6,16 @@ public class ProductResponseDTO {
 
     private Long id;
     private String name;
-    private BigDecimal value;
+    private BigDecimal price;
 
     // constructors
     public ProductResponseDTO() {
     }
 
-    public ProductResponseDTO(Long id, String name, BigDecimal value) {
+    public ProductResponseDTO(Long id, String name, BigDecimal price) {
         this.id = id;
         this.name = name;
-        this.value = value;
+        this.price = price;
     }
 
     // getters and setters
@@ -35,11 +35,11 @@ public class ProductResponseDTO {
         this.name = name;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

@@ -11,9 +11,9 @@ public class ProductRequestDTO {
     @NotBlank(message = "product name is required")
     private String name;
 
-    @NotNull(message = "product value is required")
-    @DecimalMin(value = "0.01", message = "product value must be greater than zero")
-    private BigDecimal value;
+    @NotNull(message = "product price is required")
+    @DecimalMin(value = "0.01", message = "product price must be greater than zero")
+    private BigDecimal price;
 
     // constructors
     public ProductRequestDTO() {
@@ -21,7 +21,7 @@ public class ProductRequestDTO {
 
     public ProductRequestDTO(String name, BigDecimal value) {
         this.name = name;
-        this.value = value;
+        this.price = value;
     }
 
     // getters and setters
@@ -33,11 +33,11 @@ public class ProductRequestDTO {
         this.name = name;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

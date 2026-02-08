@@ -27,7 +27,7 @@ public class ProductRepositoryTest {
         // then
         assertThat(savedProduct.getId()).isNotNull();
         assertThat(savedProduct.getName()).isEqualTo("Test Product");
-        assertThat(savedProduct.getValue()).isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(savedProduct.getPrice()).isEqualByComparingTo(new BigDecimal("100.00"));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ProductRepositoryTest {
         productRepository.save(new Product("Medium", new BigDecimal("100.00")));
 
         // when
-        List<Product> results = productRepository.findAllByOrderByValueDesc();
+        List<Product> results = productRepository.findAllByOrderByPriceDesc();
 
         // then
         assertThat(results).hasSize(3);

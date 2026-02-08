@@ -17,7 +17,7 @@ public class Product {
     private String name;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal value;
+    private BigDecimal price;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductComposition> compositions = new ArrayList<>();
@@ -27,7 +27,7 @@ public class Product {
     }
     public Product(String name, BigDecimal value) {
         this.name = name;
-        this.value = value;
+        this.price = value;
     }
 
     // Getters and Setters
@@ -47,12 +47,12 @@ public class Product {
         this.name = name;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public List<ProductComposition> getCompositions() {

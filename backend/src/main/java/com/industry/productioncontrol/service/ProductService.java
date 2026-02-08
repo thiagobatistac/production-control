@@ -44,7 +44,7 @@ public class ProductService {
 
         Product product = new Product();
         product.setName(request.getName());
-        product.setValue(request.getValue());
+        product.setPrice(request.getPrice());
 
         Product savedProduct = productRepository.save(product);
         return convertToResponseDTO(savedProduct);
@@ -63,7 +63,7 @@ public class ProductService {
         }
 
         product.setName(request.getName());
-        product.setValue(request.getValue());
+        product.setPrice(request.getPrice());
 
         Product updatedProduct = productRepository.save(product);
         return convertToResponseDTO(updatedProduct);
@@ -88,7 +88,7 @@ public class ProductService {
 
     // get all products ordered by value (for production suggestion)
     public List<Product> findAllOrderedByValue() {
-        return productRepository.findAllByOrderByValueDesc();
+        return productRepository.findAllByOrderByPriceDesc();
     }
 
     // convert entity to dto
@@ -96,7 +96,7 @@ public class ProductService {
         ProductResponseDTO dto = new ProductResponseDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
-        dto.setValue(product.getValue());
+        dto.setPrice(product.getPrice());
         return dto;
     }
 }
