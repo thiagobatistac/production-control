@@ -9,27 +9,22 @@ import {
 } from '../redux/slices/productsSlice';
 
 function ProductsPage() {
-  // redux state
   const dispatch = useDispatch();
   const { items: products, loading, error } = useSelector(state => state.products);
 
-  // local state
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // form fields
   const [formData, setFormData] = useState({
     name: '',
-    value: ''
+    price: ''
   });
 
-  // load products on mount
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  // handle search
   const handleSearch = () => {
     if (!searchTerm.trim()) {
       dispatch(fetchProducts());
@@ -38,7 +33,6 @@ function ProductsPage() {
     dispatch(searchProductsByName(searchTerm));
   };
 
-  // handle form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -47,55 +41,53 @@ function ProductsPage() {
     }));
   };
 
-  // open form to create new product
   const handleCreate = () => {
     setEditingProduct(null);
-    setFormData({ name: '', value: '' });
+    setFormData({ name: '', price: '' });
     setShowForm(true);
   };
 
-  // open form to edit product
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
-      value: product.value
+      price: product.price || ''
     });
     setShowForm(true);
   };
 
-  // submit form (create or update)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // validate
     if (!formData.name.trim()) {
       alert('Product name is required');
       return;
     }
-    if (!formData.value || parseFloat(formData.value) <= 0) {
-      alert('Product value must be greater than zero');
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      alert('Product price must be greater than zero');
       return;
     }
 
+    const productToSave = {
+      name: formData.name,
+      price: parseFloat(formData.price)
+    };
+
     try {
       if (editingProduct) {
-        // update
-        await dispatch(editProduct({ id: editingProduct.id, productData: formData })).unwrap();
+        await dispatch(editProduct({ id: editingProduct.id, productData: productToSave })).unwrap();
       } else {
-        // create
-        await dispatch(addProduct(formData)).unwrap();
+        await dispatch(addProduct(productToSave)).unwrap();
       }
       
       setShowForm(false);
-      setFormData({ name: '', value: '' });
+      setFormData({ name: '', price: '' });
       setEditingProduct(null);
     } catch (err) {
       alert('Failed to save product: ' + (err.message || 'Unknown error'));
     }
   };
 
-  // delete product
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) {
       return;
@@ -108,10 +100,9 @@ function ProductsPage() {
     }
   };
 
-  // cancel form
   const handleCancel = () => {
     setShowForm(false);
-    setFormData({ name: '', value: '' });
+    setFormData({ name: '', price: '' });
     setEditingProduct(null);
   };
 
@@ -123,7 +114,6 @@ function ProductsPage() {
       <div className="card">
         <h2>Products Management</h2>
         
-        {/* search bar */}
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
           <input
             type="text"
@@ -144,7 +134,6 @@ function ProductsPage() {
           </button>
         </div>
 
-        {/* form */}
         {showForm && (
           <div className="card" style={{ backgroundColor: '#f8f9fa' }}>
             <h3>{editingProduct ? 'Edit Product' : 'New Product'}</h3>
@@ -162,11 +151,11 @@ function ProductsPage() {
               </div>
 
               <div className="form-group">
-                <label>Value (R$) *</label>
+                <label>Price (R$) *</label>
                 <input
                   type="number"
-                  name="value"
-                  value={formData.value}
+                  name="price"
+                  value={formData.price}
                   onChange={handleInputChange}
                   placeholder="0.00"
                   step="0.01"
@@ -187,7 +176,6 @@ function ProductsPage() {
           </div>
         )}
 
-        {/* table */}
         {products.length === 0 ? (
           <p>No products found. Create your first product!</p>
         ) : (
@@ -196,7 +184,7 @@ function ProductsPage() {
               <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Value (R$)</th>
+                <th>Price (R$)</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -205,7 +193,7 @@ function ProductsPage() {
                 <tr key={product.id}>
                   <td>{product.id}</td>
                   <td>{product.name}</td>
-                  <td>R$ {parseFloat(product.value).toFixed(2)}</td>
+                  <td>R$ {parseFloat(product.price).toFixed(2)}</td>
                   <td>
                     <button 
                       onClick={() => handleEdit(product)} 
