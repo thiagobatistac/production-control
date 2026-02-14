@@ -114,14 +114,14 @@ function ProductsPage() {
       <div className="card">
         <h2>Products Management</h2>
         
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <input
             type="text"
             placeholder="Search products by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            style={{ flex: 1, padding: '0.5rem', fontSize: '1rem' }}
+            style={{ flex: 1, minWidth: '200px', padding: '0.5rem', fontSize: '1rem' }}
           />
           <button onClick={handleSearch} className="btn btn-secondary">
             Search
@@ -191,10 +191,10 @@ function ProductsPage() {
             <tbody>
               {products.map(product => (
                 <tr key={product.id}>
-                  <td>{product.id}</td>
-                  <td>{product.name}</td>
-                  <td>R$ {parseFloat(product.price).toFixed(2)}</td>
-                  <td>
+                  <td data-label="ID">{product.id}</td>
+                  <td data-label="Name">{product.name}</td>
+                  <td data-label="Price">R$ {parseFloat(product.price).toFixed(2)}</td>
+                  <td data-label="Actions">
                     <button 
                       onClick={() => handleEdit(product)} 
                       className="btn btn-primary"
