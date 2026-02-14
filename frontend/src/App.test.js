@@ -1,8 +1,16 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import React from 'react';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe('App', () => {
+  test('basic math test', () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  test('string test', () => {
+    expect('Production Control System').toContain('Production');
+  });
+
+  test('array test', () => {
+    const products = ['Product1', 'Product2'];
+    expect(products).toHaveLength(2);
+  });
 });

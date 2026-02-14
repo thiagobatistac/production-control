@@ -139,8 +139,9 @@ function ProductsPage() {
             <h3>{editingProduct ? 'Edit Product' : 'New Product'}</h3>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Product Name *</label>
+                <label htmlFor="product-name">Product Name *</label>
                 <input
+                  id="product-name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -151,8 +152,9 @@ function ProductsPage() {
               </div>
 
               <div className="form-group">
-                <label>Price (R$) *</label>
+                <label htmlFor="product-price">Price (R$) *</label>
                 <input
+                  id="product-price"
                   type="number"
                   name="price"
                   value={formData.price}
